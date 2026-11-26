@@ -1,0 +1,35 @@
+{
+  "data": {
+    "bookmark_timeline_v2": {
+      "timeline": {
+        "instructions": [{
+          "entries": [
+            {
+              "entryId": "tweet-1860123456789000001",
+              "content": { "itemContent": { "tweet_results": { "result": {
+                "__typename": "TweetWithVisibilityResults",
+                "tweet": {
+                  "__typename": "Tweet",
+                  "rest_id": "1860123456789000001",
+                  "legacy": {
+                    "full_text": "截断的预览…",
+                    "created_at": "Tue Nov 19 09:40:00 +0000 2024",
+                    "entities": { "urls": [{ "url": "https://t.co/short" }] }
+                  },
+                  "note_tweet": { "note_tweet_results": { "result": {
+                    "text": " 长文全文：离线收藏与同步\nNotes from a train ride. "
+                  } } },
+                  "core": { "user_results": { "result": { "core": { "screen_name": "lin_notes" } } } },
+                  "quoted_status_result": { "result": { "rest_id": "314", "legacy": { "full_text": "quoted" } } }
+                }
+              } } } }
+            },
+            { "content": { "cursorType": "Bottom", "value": "opaque" } },
+            { "content": { "itemContent": { "tweet_results": { "result": { "__typename": "TweetTombstone", "text": "此帖已删除" } } } } },
+            null
+          ]
+        }]
+      }
+    }
+  }
+}
