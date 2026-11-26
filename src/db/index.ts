@@ -24,6 +24,7 @@ export class InboxDatabase extends Dexie {
   constructor(name = 'memoflow') {
     super(name)
     this.version(1).stores({ items: 'id, &fingerprint, importedAt' })
+    this.version(2).stores({ items: 'id, &fingerprint, importedAt, status' })
   }
 
   async importItems(drafts: InboxDraft[]) {
@@ -60,6 +61,13 @@ export class InboxDatabase extends Dexie {
       const original = await this.items.get(id)
       if (!original) throw new Error('条目不存在。')
       const item = { ...original, ...changes }
+      const contentChanged = Object.keys(changes).some(key => key !== 'status' && key !== 'errorMessage')
+      if (contentChanged || changes.status === 'pending') {
+        item.status = changes.status ?? (original.status === 'archived' ? 'archived' : 'pending')
+        delete item.ai
+        delete item.errorMessage
+      }
+      if (contentChanged || item.status !== 'processing') delete item.processingToken
       // Web Crypto runs outside IndexedDB. Keep the transaction alive while hashing.
       const identity = await Dexie.waitFor(identify(item))
       await this.items.put({ ...item, ...identity })

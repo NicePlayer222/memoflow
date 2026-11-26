@@ -17,6 +17,7 @@ export interface InboxItem extends InboxDraft {
   createdAt: string
   importedAt: string
   status: Status
+  processingToken?: string
   errorMessage?: string
   fingerprint: string
   ai?: {

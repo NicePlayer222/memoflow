@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { ArrowDownToLine, ArrowUpRight, BookOpen, Database, FileText, Globe, Inbox, Layers, PenLine, Plus, Upload } from 'lucide-react'
 import { db } from './db'
+import { reportQueueError, retryFailed, setPaused, useQueueState } from './ai/runtime'
 import { parseBrowserHtml } from './parsers/browserHtml'
 import { parseMarkdownLinks } from './parsers/markdownLinks'
 import { parseXBookmarks } from './parsers/xBookmarks'
@@ -26,6 +27,7 @@ function errorText(error: unknown) {
 }
 
 export default function App() {
+  const queue = useQueueState()
   const [format, setFormat] = useState<Format>('markdown')
   const [input, setInput] = useState('')
   const [message, setMessage] = useState('')
@@ -105,6 +107,12 @@ export default function App() {
               <h2 id="list-heading"><Inbox size={19} /> 已收录</h2>
               <span>{result && !result.error ? `${result.items.length} 条记录` : '—'}</span>
             </div>
+            <div className="flex flex-wrap items-center gap-2 px-6 py-2 text-sm">
+              <span>{queue.paused ? '队列已暂停' : '自动整理中'} · 已就绪 {result?.items.filter(item => item.status === 'ready').length ?? 0}</span>
+              <button onClick={() => setPaused(!queue.paused)}>{queue.paused ? '继续' : '暂停'}</button>
+              {result?.items.some(item => item.status === 'failed') && <button onClick={() => void retryFailed().catch(reportQueueError)}>重试失败项</button>}
+              {queue.error && <span role="alert">{queue.error}</span>}
+            </div>
             {!result ? <p className="empty">正在读取收件箱…</p>
               : result.error ? <p className="empty" role="alert">读取失败：{result.error}</p>
               : result.items.length === 0 ? (
@@ -118,6 +126,8 @@ export default function App() {
                 return <li key={item.id}>
                   <span className="item-source"><Icon size={13} /> {label}{item.folderPath?.length ? ' · ' + item.folderPath.join(' / ') : ''}</span>
                   <h3>{item.url ? <a href={item.url} target="_blank" rel="noreferrer">{item.title} <ArrowUpRight size={14} /></a> : item.title}</h3>
+                  {item.ai && <div className="mt-2 text-sm"><strong>{item.ai.category}</strong> · {item.ai.tags.join(' / ')}<p>{item.ai.summary}</p></div>}
+                  {item.status === 'failed' && <p role="alert">{item.errorMessage}</p>}
                   {item.rawContent && item.rawContent !== item.title && <p>{item.rawContent}</p>}
                 </li>
               })}</ul>}
