@@ -45,6 +45,9 @@ export function DetailPane({ item, onArchive, onRequeue, onClose, notify }: Prop
           <button className="outline" onClick={onArchive}><Archive size={14}/>{item.status === 'archived' ? '取消归档' : '归档'}<kbd>E</kbd></button>
           <button className="outline" onClick={onRequeue}><RotateCcw size={14}/>重新整理<kbd>R</kbd></button>
         </div>
+        {!item.ai && (item.status === 'processing' || item.status === 'pending') && <p className="detail-date" role="status">
+          {item.status === 'processing' ? '正在整理，完成后将在这里显示摘要。' : '等待队列整理，原文可先行阅读。'}
+        </p>}
         {item.ai && <section className="analysis-card"><h3><ListChecks size={16}/>整理摘要</h3><p>{item.ai.summary}</p>
           <ul>{item.ai.takeaways.map((value, i) => <li key={i}>{value}</li>)}</ul>
           <div className="tags">{item.ai.tags.map((tag, i) => <span key={i}># {tag}</span>)}</div>

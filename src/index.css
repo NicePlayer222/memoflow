@@ -65,6 +65,8 @@ kbd { display: inline-block; padding: 1px 4px; font: 10px/1.4 ui-monospace, mono
 .dot.ready { background: #6a966b; } .dot.processing,.dot.pending { background: #b28b45; } .dot.failed { background: var(--danger); }
 .records, .detail-body { overflow-y: auto; min-height: 0; overscroll-behavior: contain; }
 .records { border-top: 1px solid var(--line); flex: 1; }
+.pager { display: flex; justify-content: center; align-items: center; gap: 16px; padding: 8px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+.pager button { padding: 4px 10px; border: 1px solid var(--line); border-radius: 4px; }
 .record { display: grid; gap: 5px; text-align: left; width: 100%; border-bottom: 1px solid var(--line); padding: 14px 23px; }
 .record:hover { background: var(--bg); }
 .record[data-selected=true] { background: var(--active); box-shadow: inset 3px 0 var(--accent); }

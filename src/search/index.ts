@@ -15,6 +15,7 @@ function tokens(text: string, includeCharacters = false): string[] {
 }
 
 export function buildIndex(items: InboxItem[]) {
+  const start = performance.now()
   const index = new MiniSearch({
     fields: ['title', 'rawContent', 'summary', 'tags', 'searchKeywords'],
     tokenize: text => tokens(text, true),
@@ -33,11 +34,17 @@ export function buildIndex(items: InboxItem[]) {
     tags: item.ai?.tags.join(' ') ?? '',
     searchKeywords: item.ai?.searchKeywords.join(' ') ?? '',
   })))
+  performance.clearMeasures('memoflow.search-index')
+  performance.measure('memoflow.search-index', { start, detail: { count: items.length } })
   return index
 }
 
 export function searchItems(index: ReturnType<typeof buildIndex>, query: string): string[] {
-  return index.search(query).map(result => String(result.id))
+  const start = performance.now()
+  const ids = index.search(query).map(result => String(result.id))
+  performance.clearMeasures('memoflow.search-query')
+  performance.measure('memoflow.search-query', { start, detail: { matches: ids.length } })
+  return ids
 }
 
 export function highlightPattern(query: string): RegExp | undefined {

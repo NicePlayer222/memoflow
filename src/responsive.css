@@ -1,0 +1,20 @@
+.topbar .crumb {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.crumb-current, .list-header h1 {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.crumb-current { font-weight: inherit; }
+.topbar .primary, .crumb > svg, .crumb > button { flex-shrink: 0; }
+
+.source-link, .tags, .tags span, .tag-choices button { max-width: 100%; }
+.source-link, .tag-choices button { overflow-wrap: anywhere; }
+.source-link svg, .tag-choices button svg { flex-shrink: 0; }
+.mf-dialog .mf-field { grid-template-columns: minmax(0, 1fr); }
+.mf-dialog .mf-field :is(select, input, textarea) { min-width: 0; }

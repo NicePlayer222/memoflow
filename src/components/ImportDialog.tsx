@@ -28,7 +28,10 @@ export function ImportDialog({ onClose, notify }: { onClose: () => void; notify:
     try {
       const drafts = await read()
       if (!drafts.length) throw new Error('未找到可导入的条目，请检查内容和格式。')
+      const started = performance.now()
       const { added, duplicates } = await db.importItems(drafts)
+      performance.clearMeasures('memoflow.import-items')
+      performance.measure('memoflow.import-items', { start: started, detail: { count: drafts.length } })
       notify(`已新增 ${added} 条，重复 ${duplicates} 条。`)
       onClose()
     } catch (cause) {
