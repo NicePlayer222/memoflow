@@ -1,0 +1,19 @@
+.inbox-search { width: 100%; }
+.search-input-row {
+  display: flex; align-items: center; gap: .65rem; padding: .7rem .85rem;
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent); border-radius: .5rem;
+}
+.inbox-search [cmdk-input] { width: 100%; background: transparent; color: inherit; outline: 0; }
+.search-input-row:focus-within { outline: 2px solid var(--accent, #7773ba); outline-offset: 1px; }
+.inbox-search [cmdk-list] { max-height: min(54vh, 26rem); overflow-y: auto; margin-top: .75rem; }
+.inbox-search [cmdk-group-heading], .inbox-search [cmdk-list] p {
+  padding: .5rem .7rem; opacity: .72; font-size: .8rem;
+}
+.inbox-search [cmdk-item] { display: flex; align-items: center; gap: .65rem; padding: .55rem .7rem; border-radius: .4rem; cursor: pointer; }
+.inbox-search [cmdk-item] > svg { flex: none; opacity: .65; }
+.inbox-search [cmdk-item][data-selected=true] { background: color-mix(in srgb, currentColor 10%, transparent); }
+.search-hit { display: grid; gap: .18rem; min-width: 0; }
+.search-hit strong, .search-hit small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.search-hit strong { font-weight: 550; }
+.search-hit small { opacity: .76; }
+.inbox-search mark { background: #f4e197; color: #342800; border-radius: .14em; }

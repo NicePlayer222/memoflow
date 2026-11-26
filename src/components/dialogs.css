@@ -1,0 +1,50 @@
+.mf-dialog {
+  width: min(460px, calc(100vw - 32px));
+  max-height: calc(100dvh - 40px);
+  margin: auto;
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 18px 70px #10142033;
+}
+.mf-dialog::backdrop { background: rgb(12 16 25 / 42%); }
+.mf-dialog .mf-dialog-heading {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 17px 22px; border-bottom: 1px solid var(--line);
+}
+.mf-dialog .mf-dialog-heading h2 { margin: 0; color: var(--text); font-size: 18px; font-weight: 650; }
+.mf-dialog .mf-dialog-close {
+  display: grid; place-items: center; width: 32px; height: 32px;
+  border: 0; border-radius: 6px; padding: 0; color: var(--muted); background: transparent;
+}
+.mf-dialog .mf-dialog-close:hover { background: var(--soft); color: var(--text); }
+.mf-dialog .mf-dialog-body { padding: 20px 22px 22px; }
+.mf-dialog .mf-field { display: grid; gap: 6px; margin: 0 0 16px; color: var(--text); font-size: 13px; font-weight: 550; }
+.mf-dialog .mf-field :is(input, select, textarea) {
+  width: 100%; min-height: 38px; box-sizing: border-box; padding: 8px 10px;
+  border: 1px solid var(--line); border-radius: 7px; color: var(--text); background: var(--bg);
+  font: inherit; font-size: 14px; font-weight: 400;
+}
+.mf-dialog .mf-field textarea { resize: vertical; line-height: 1.5; }
+.mf-dialog .mf-field textarea::placeholder { color: var(--muted); }
+.mf-dialog .mf-action {
+  display: inline-flex; justify-content: center; align-items: center; gap: 7px;
+  border: 1px solid var(--line); border-radius: 7px; padding: 8px 12px;
+  color: var(--text); background: var(--panel); font-size: 13px; font-weight: 550;
+}
+.mf-dialog .mf-action:hover:enabled { background: var(--soft); }
+.mf-dialog .mf-confirm { border-color: var(--accent); background: var(--accent); color: var(--panel); }
+.mf-dialog .mf-confirm:hover:enabled { background: var(--accent); filter: brightness(.92); }
+.mf-dialog .mf-action:disabled { opacity: .5; cursor: default; }
+.mf-dialog :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mf-dialog .mf-import-options, .mf-dialog .mf-dialog-actions {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  margin-top: 19px; padding-top: 17px; border-top: 1px solid var(--line);
+}
+.mf-dialog .mf-dialog-actions { justify-content: flex-end; }
+.mf-dialog .mf-hint, .mf-dialog .mf-form-error { margin: 10px 0 16px; font-size: 12px; line-height: 1.6; color: var(--muted); }
+.mf-dialog .mf-form-error { font-weight: 600; color: var(--text); overflow-wrap: anywhere; }

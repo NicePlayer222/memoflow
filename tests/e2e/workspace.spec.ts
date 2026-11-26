@@ -1,0 +1,110 @@
+import { expect, test as base } from '@playwright/test'
+
+const test = base.extend({
+  page: async ({ page, baseURL, context }, use) => {
+    const issues: string[] = []
+    page.on('console', message => {
+      if (message.type() === 'error') issues.push(message.text())
+    })
+    page.on('pageerror', error => issues.push(error.message))
+    await context.route(/^https?:\/\//, route => {
+      const url = new URL(route.request().url())
+      if (url.origin === baseURL) return route.continue()
+      issues.push(`Unexpected network request: ${url.origin}${url.pathname}`)
+      return route.abort()
+    })
+    await use(page)
+    expect(issues, 'browser errors or external traffic').toEqual([])
+  },
+})
+
+test('saves a BYOK preset and theme locally and restores focus after Escape', async ({ page }) => {
+  await page.goto('/')
+  const settings = page.getByRole('button', { name: '设置', exact: true })
+  await settings.click()
+  const dialog = page.getByRole('dialog')
+  await dialog.getByLabel('AI 提供方').selectOption('ollama')
+  await expect(dialog.getByLabel('API 基础地址')).toHaveValue('http://localhost:11434/v1')
+  await dialog.getByLabel('模型名称').fill('local-example')
+  await dialog.getByLabel('并发数').selectOption('4')
+  await dialog.getByRole('button', { name: '保存设置' }).click()
+  const before = await page.locator('html').getAttribute('data-theme')
+  await page.getByRole('button', { name: /切换到.*主题/ }).click()
+  await page.reload()
+  await expect(page.locator('html')).toHaveAttribute('data-theme', before === 'dark' ? 'light' : 'dark')
+  await settings.click()
+  await expect(dialog.getByLabel('模型名称')).toHaveValue('local-example')
+  await expect(dialog.getByLabel('并发数')).toHaveValue('4')
+  await page.keyboard.press('Escape')
+  await expect(dialog).toHaveCount(0)
+  await expect(settings).toBeFocused()
+})
+
+test('mock queue, Chinese search, selection, archive and reprocess', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: '导入', exact: true }).click()
+  await page.getByRole('button', { name: '加载演示数据' }).click()
+  await expect(page.getByTestId('queue-status')).toContainText(/就绪\s*20/)
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+
+  const rows = page.getByTestId('inbox-row')
+  const selected = page.locator('[data-testid="inbox-row"][data-selected="true"]')
+  await expect(rows).toHaveCount(20)
+  await page.keyboard.press('Control+k')
+  const search = page.getByRole('dialog')
+  await search.getByRole('combobox').fill('离线存储')
+  const title = '在浏览器里留一份自己的数据'
+  await search.getByRole('option').filter({ hasText: title }).click()
+  await expect(page.getByTestId('detail-title')).toHaveText(title)
+  await expect(selected).toContainText(title)
+
+  const id = await selected.getAttribute('data-id')
+  expect(id).toBeTruthy()
+  // Seed timestamps can tie. Choose an available neighbor in the actual order.
+  const direction = (await rows.last().getAttribute('data-id')) === id ? 'k' : 'j'
+  await page.keyboard.press(direction)
+  await expect(selected).not.toHaveAttribute('data-id', id!)
+  await page.keyboard.press(direction === 'j' ? 'k' : 'j')
+  await expect(selected).toHaveAttribute('data-id', id!)
+
+  await page.keyboard.press('e')
+  await page.getByRole('button', { name: /^已归档/ }).click()
+  await expect(rows).toHaveCount(1)
+  await rows.first().click()
+  await expect(page.getByTestId('detail-title')).toHaveText(title)
+  await page.getByRole('button', { name: /暂停/ }).click()
+  await page.keyboard.press('r')
+  await expect(rows).toHaveCount(0)
+  await page.getByRole('button', { name: /^待处理/ }).click()
+  await expect(rows).toHaveCount(1)
+  await expect(rows.first()).toHaveAttribute('data-id', id!)
+})
+
+test('file import, editing shortcuts, duplicate feedback and persistence', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: '导入', exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  const markdown = '[城市散步记录](https://example.org/walk)'
+  await dialog.locator('input[type=file]').setInputFiles({
+    name: 'walk.md', mimeType: 'text/markdown', buffer: Buffer.from(markdown),
+  })
+  await expect(page.getByTestId('queue-status')).toContainText(/就绪\s*1/)
+  await expect(dialog).toHaveCount(0)
+  await page.getByTestId('inbox-row').click()
+  await page.getByRole('button', { name: /暂停/ }).click()
+  await page.getByRole('button', { name: '导入', exact: true }).click()
+  const editor = dialog.locator('textarea')
+  await editor.pressSequentially('jke')
+  await expect(page.getByTestId('queue-status')).toContainText(/就绪\s*1/)
+  await editor.press('r')
+  await expect(editor).toHaveValue('jker')
+  await expect(page.getByTestId('queue-status')).toContainText(/就绪\s*1/)
+  await editor.fill(markdown)
+  await dialog.getByRole('button', { name: /导入粘贴内容/ }).click()
+  await expect(page.getByText(/已新增 0 条，重复 1 条/)).toBeVisible()
+  await page.reload()
+  await expect(page.getByTestId('inbox-row')).toHaveCount(1)
+  await expect(page.getByTestId('inbox-row')).toContainText('城市散步记录')
+  await page.getByRole('button', { name: /^已归档/ }).click()
+  await expect(page.getByTestId('inbox-row')).toHaveCount(0)
+})
