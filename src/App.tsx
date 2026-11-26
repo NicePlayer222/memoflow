@@ -8,6 +8,8 @@ import { DetailPane } from './components/DetailPane'
 import { ImportDialog } from './components/ImportDialog'
 import { SearchDialog } from './components/SearchDialog'
 import { SettingsDialog } from './components/SettingsDialog'
+import { TagsDialog } from './components/TagsDialog'
+import { DataDialog } from './components/DataDialog'
 import type { InboxItem, Status } from './types/inbox'
 
 const views = [
@@ -16,7 +18,7 @@ const views = [
   { id: 'archived', label: '已归档', icon: Archive },
 ] as const
 type View = typeof views[number]['id']
-type Modal = 'import' | 'settings' | 'search' | null
+type Modal = 'import' | 'settings' | 'search' | 'tags' | 'data' | null
 const sources = { browser: ['浏览器书签', Globe], markdown: ['Markdown', FileText], x: ['X 书签', BookOpen], manual: ['手记', PenLine] } as const
 const statuses: Record<Status, string> = { pending: '待处理', processing: '整理中', ready: '已就绪', failed: '失败', archived: '已归档' }
 const emptyItems: InboxItem[] = []
@@ -122,6 +124,8 @@ export default function App() {
             </button>)}</details>
         })}
       </div>
+      <div className="library-tools"><button onClick={() => open('tags')}><Hash size={16}/>标签管理</button>
+        <button onClick={() => open('data')}><Archive size={16}/>导出与备份</button></div>
       <footer><button onClick={() => open('settings')} aria-label="设置"><Settings2 size={16}/>设置</button>
         <button aria-label={dark ? '切换到浅色主题' : '切换到深色主题'} onClick={() => setDark(!dark)}>{dark ? <Sun size={17}/> : <Moon size={17}/>}</button></footer>
     </aside>
@@ -158,6 +162,9 @@ export default function App() {
     </main>
     {modal === 'import' && <ImportDialog onClose={() => open(null)} notify={notify}/>}
     {modal === 'settings' && <SettingsDialog onClose={() => open(null)} notify={notify}/>}
+    {modal === 'tags' && <TagsDialog items={items} onClose={() => open(null)} notify={notify}
+      onFilter={name => { changeView('all', { type: 'tag', name }); open(null) }}/>}
+    {modal === 'data' && <DataDialog onClose={() => open(null)} notify={notify}/>}
     {modal === 'search' && <SearchDialog items={items} index={index} onClose={() => open(null)}
       onSelect={id => { changeView('all'); select(id); open(null) }} onImport={() => open('import')} onSettings={() => open('settings')}/>}
     {message && <div className="toast" role="status">{message}<button aria-label="关闭提示" onClick={() => notify('')}><X size={14}/></button></div>}

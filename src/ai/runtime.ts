@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { db } from '../db'
-import { ProcessingQueue } from './queue'
+import { ProcessingQueue, queueLockName } from './queue'
 import { loadSettings, providerFor, saveSettings, settingsKey, type Settings } from './settings'
 
 const pauseKey = 'memoflow.queue.paused'
@@ -56,6 +56,18 @@ export function setPaused(paused: boolean) {
 
 export async function retryFailed() {
   await queue?.retryFailed()
+}
+
+// Take a consistent snapshot after any in-flight analysis has committed.
+// Other tabs observe the pause and share the same lock as the processing queue.
+export async function withIdleQueue<T>(operation: () => Promise<T>) {
+  const wasPaused = localStorage.getItem(pauseKey) === 'true'
+  if (!wasPaused) setPaused(true)
+  try {
+    return await navigator.locks.request(queueLockName(db), operation)
+  } finally {
+    if (!wasPaused) setPaused(false)
+  }
 }
 
 function subscribe(notify: () => void) {

@@ -35,6 +35,15 @@ kbd { display: inline-block; padding: 1px 4px; font: 10px/1.4 ui-monospace, mono
 .rail details button { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
 .rail footer { display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--line); }
 .rail footer button { width: auto; }
+.library-tools { padding: 8px 0; border-top: 1px solid var(--line); }
+.data-tools h3 { margin: 14px 0 8px; font-size: 14px; font-weight: 650; }
+.data-tools h3:first-child { margin-top: 0; }
+.tag-choices { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+.tag-choices small { color: var(--muted); }
+.tool-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.danger-button { color: var(--danger); display: inline-flex; align-items: center; gap: 7px; margin-top: 22px; }
+.confirm-box { border: 1px solid var(--line); border-radius: 6px; padding: 12px; margin-top: 12px; }
+.confirm-box p { margin-bottom: 12px; font-size: 13px; overflow-wrap: anywhere; }
 .desk { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: var(--panel); }
 .topbar, .pane-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); }
 .topbar { padding: 0 25px; height: 59px; flex: none; }

@@ -2,7 +2,7 @@ import Dexie, { type Table } from 'dexie'
 import { normalizeUrl } from '../parsers/normalizeUrl'
 import type { InboxDraft, InboxItem } from '../types/inbox'
 
-async function identify(draft: InboxDraft) {
+export async function identify(draft: InboxDraft) {
   const canonicalUrl = draft.url ? normalizeUrl(draft.url) : undefined
   if (draft.url && !canonicalUrl) throw new Error('链接必须是有效的 HTTP 或 HTTPS 地址。')
   if (!canonicalUrl && !draft.title.trim() && !draft.rawContent.trim()) {

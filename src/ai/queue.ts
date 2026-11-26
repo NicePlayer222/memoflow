@@ -9,6 +9,10 @@ interface QueueOptions {
   onError?: (error: unknown) => void
 }
 
+export function queueLockName(db: InboxDatabase) {
+  return `memoflow-queue:${db.name}`
+}
+
 function delay(ms: number, signal: AbortSignal) {
   return new Promise<void>(resolve => {
     function done() {
@@ -101,7 +105,7 @@ export class ProcessingQueue {
   }
 
   private async runWithLock(signal: AbortSignal) {
-    await navigator.locks.request(`memoflow-queue:${this.db.name}`, { signal }, async () => {
+    await navigator.locks.request(queueLockName(this.db), { signal }, async () => {
       if (this.recover) {
         await this.db.items.where('status').equals('processing')
           .modify({ status: 'pending', processingToken: undefined })

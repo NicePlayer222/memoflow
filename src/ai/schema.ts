@@ -14,7 +14,7 @@ function strings(value: unknown, name: string, min: number, max: number): string
   return value.map(entry => entry.trim())
 }
 
-export function validateAnalysis(value: unknown): AnalysisFields {
+export function validateAnalysis(value: unknown, minTags: 1 | 2 = 2): AnalysisFields {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('AI 结果应为 JSON 对象。')
   const data = value as Record<string, unknown>
   if (Object.keys(data).some(key => !fields.some(field => key === field))) throw new Error('AI 结果含未定义的字段。')
@@ -25,7 +25,7 @@ export function validateAnalysis(value: unknown): AnalysisFields {
   if (!category) throw new Error('category 不在预设分类中。')
   return {
     summary: data.summary.trim(), category,
-    tags: strings(data.tags, 'tags', 2, 5),
+    tags: strings(data.tags, 'tags', minTags, 5),
     takeaways: strings(data.takeaways, 'takeaways', 1, 3),
     searchKeywords: strings(data.searchKeywords, 'searchKeywords', 3, 8),
   }
